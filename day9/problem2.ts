@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { runInThisContext } from 'vm';
 
 const testResult = fs.readFileSync(path.resolve(__dirname, './testData2.text'), { encoding: 'utf-8', flag: 'r' });
 const result = fs.readFileSync(path.resolve(__dirname, './data.text'), { encoding: 'utf8', flag: 'r' });
@@ -35,74 +36,19 @@ class Tail {
   }
 
   moveTail(head: Head | Tail) {
-    if (head.x === this.x && Math.abs(head.y - this.y) > 1) {
-      const rowDifference = (head.y - this.y) / 2;
-      this.y = this.y + rowDifference;
-    }
-
-    if (head.y === this.y && Math.abs(head.x - this.x) > 1) {
-      const colDifference = (head.x - this.x) / 2;
-      this.x = this.x + colDifference;
-    }
-
-    if (head.y === this.y + 2 && head.x === this.x + 1) {
-      this.x = this.x + 1;
-      this.y = this.y + 1;
-    }
-
-    if (head.y === this.y + 2 && head.x === this.x - 1) {
-      this.x = this.x - 1;
-      this.y = this.y + 1;
-    }
-
-    if (head.y === this.y - 2 && head.x === this.x + 1) {
-      this.x = this.x + 1;
-      this.y = this.y - 1;
-    }
-
-    if (head.y === this.y - 2 && head.x === this.x - 1) {
-      this.x = this.x - 1;
-      this.y = this.y - 1;
-    }
-
-    if (head.y === this.y + 1 && head.x === this.x + 2) {
-      this.x = this.x + 1;
-      this.y = this.y + 1;
-    }
-
-    if (head.y === this.y + 1 && head.x === this.x - 2) {
-      this.x = this.x - 1;
-      this.y = this.y + 1;
-    }
-
-    if (head.y === this.y - 1 && head.x === this.x + 2) {
-      this.x = this.x + 1;
-      this.y = this.y - 1;
-    }
-
-    if (head.y === this.y - 1 && head.x === this.x - 2) {
-      this.x = this.x - 1;
-      this.y = this.y - 1;
-    }
-
-    if (head.y === this.y + 2 && head.x === this.x + 2) {
-      this.x = this.x + 1;
-      this.y = this.y + 1;
-    }
-
-    if (head.y === this.y - 2 && head.x === this.x - 2) {
-      this.x = this.x - 1;
-      this.y = this.y - 1;
-    }
-
-    if (head.y === this.y - 2 && head.x === this.x + 2) {
-      this.x = this.x + 1;
-      this.y = this.y - 1;
-    }
-
-    if (head.y === this.y + 2 && head.x === this.x - 2) {
-      this.x = this.x - 1;
-      this.y = this.y + 1;
+    if (Math.abs(head.x - this.x) === 2 && Math.abs(head.y - this.y) === 2) {
+      this.x = this.x + (head.x - this.x) / 2;
+      this.y = this.y + (head.y - this.y) / 2;
+    } else if (head.x === this.x && Math.abs(head.y - this.y) > 1) {
+      this.y = this.y + (head.y - this.y) / 2;
+    } else if (head.y === this.y && Math.abs(head.x - this.x) > 1) {
+      this.x = this.x + (head.x - this.x) / 2;
+    } else if (Math.abs(head.y - this.y) > 1) {
+      this.y = this.y + (head.y - this.y) / 2;
+      this.x = this.x + Math.ceil(head.x - this.x);
+    } else if (Math.abs(head.x - this.x) > 1) {
+      this.y = this.y + Math.ceil(head.y - this.y);
+      this.x = this.x + (head.x - this.x) / 2;
     }
 
     this.moveHistory.add(`${this.x},${this.y}`);
@@ -180,5 +126,7 @@ lines.forEach((line: string) => {
     tail9.moveTail(tail8);
   }
 });
+
+// correct answer: 2427
 
 console.log(tail9.moveHistory.size);
